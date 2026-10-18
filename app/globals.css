@@ -1,26 +1,120 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════
+   AutoCare AI — Design System
+   ═══════════════════════════════════════════════════════════════
+   
+   Tokens → components → pages.
+   
+   Colour philosophy:
+     • Zinc scale for all neutrals (warm-toned, not cold blue-grey)
+     • A single expressive accent: automotive orange (#F97316)
+     • Status colours kept to standard semantics only
+   
+   All custom colour tokens in @theme generate Tailwind utilities:
+     --color-accent  →  bg-accent, text-accent, border-accent, etc.
+   ═══════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* Brand — charcoal/near-black */
+  --color-brand:       #18181B;
+  --color-brand-hover: #27272A;
+
+  /* Accent — automotive orange. The only expressive colour. */
+  --color-accent:      #F97316;
+  --color-accent-dark: #EA580C;
+  --color-accent-muted:#FFF7ED;
+
+  /* Font families — resolved from Next.js font vars injected on <html> */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Shadow scale — restrained. Prefer borders over heavy drop shadows. */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Semantic design tokens
+   Use var(--token) in component CSS when Tailwind utilities aren't
+   expressive enough (e.g. multi-value box-shadow for focus rings).
+   ─────────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Backgrounds */
+  --bg-base:    #FAFAF9;   /* page background — warm off-white */
+  --bg-surface: #FFFFFF;   /* card / panel surfaces */
+  --bg-raised:  #F4F4F5;   /* slightly elevated surfaces (hover, table header) */
+  --bg-subtle:  #E4E4E7;   /* deeply inset or disabled areas */
+
+  /* Borders */
+  --border:        #E4E4E7;  /* default border */
+  --border-strong: #D4D4D8;  /* emphasised border (input, focused container) */
+
+  /* Text hierarchy */
+  --text-1: #09090B;  /* primary — headings, labels */
+  --text-2: #52525B;  /* secondary — body, descriptions */
+  --text-3: #A1A1AA;  /* muted — hints, placeholders */
+  --text-4: #D4D4D8;  /* disabled */
+
+  /* Status — background/border/text trios */
+  --c-success:    #16A34A;  --c-success-bg: #F0FDF4;  --c-success-bd: #BBF7D0;
+  --c-warning:    #D97706;  --c-warning-bg: #FFFBEB;  --c-warning-bd: #FDE68A;
+  --c-error:      #DC2626;  --c-error-bg:   #FEF2F2;  --c-error-bd:   #FECACA;
+  --c-info:       #2563EB;  --c-info-bg:    #EFF6FF;  --c-info-bd:    #BFDBFE;
+
+  /* Focus rings — 2px white gap + 2px brand/accent outline */
+  --ring-brand:  0 0 0 2px #FFFFFF, 0 0 0 4px #18181B;
+  --ring-accent: 0 0 0 2px #FFFFFF, 0 0 0 4px #F97316;
+  --ring-error:  0 0 0 2px #FFFFFF, 0 0 0 4px #DC2626;
+
+  /* Sidebar (dark) */
+  --sidebar-bg:     #09090B;
+  --sidebar-border: #27272A;
+  --sidebar-text:   #A1A1AA;
+  --sidebar-text-active: #FFFFFF;
+  --sidebar-item-hover: rgb(255 255 255 / 0.06);
+  --sidebar-item-active: rgb(255 255 255 / 0.10);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ───────────────────────────────────────────────────────────────
+   Base / Reset
+   ─────────────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: none;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Enable common OpenType features for quality typography */
+  font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
 }
+
+/* Global focus ring — consistent across all interactive elements */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-brand);
+  border-radius: 0.25rem;
+}
+
+/* Brand-coloured text selection */
+::selection {
+  background: rgb(249 115 22 / 0.15);
+  color: var(--text-1);
+}
+
+/* Refined scrollbar — minimal, not distracting */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+

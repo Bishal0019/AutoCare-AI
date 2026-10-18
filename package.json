@@ -9,9 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.87",
+    "@ai-sdk/react": "^4.0.130",
+    "@clerk/nextjs": "^7.9.7",
+    "@google/genai": "^2.28.0",
+    "ai": "^7.0.127",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.48.0",
+    "mongoose": "^9.10.2",
     "next": "16.3.6",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
