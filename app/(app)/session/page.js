@@ -29,7 +29,7 @@ export default async function SessionPage() {
   const { firstName, vehicle } = await getUIContext(userId);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] lg:h-screen overflow-hidden">
       <PageHeader
         title="AutoCare AI"
         description={

@@ -1,44 +1,62 @@
 /**
  * (app) Layout — Authenticated application shell
  *
- * All routes inside app/(app)/ share this layout:
- *   Desktop (≥ lg / 1024 px):
- *     - Dark fixed sidebar (240px, w-60)
- *     - Light scrollable main area offset by sidebar width (ml-60)
+ * All routes inside app/(app)/ share this layout.
  *
- *   Mobile (< lg):
- *     - MobileNav: sticky dark header + slide-out drawer
- *     - Main area uses the full viewport width (no left margin)
+ * Desktop (≥ lg / 1024 px):
+ *   - Sidebar: position:fixed, w-60 (240 px), dark, always visible.
+ *   - Main:    ml-60 block offset, full remaining width, no top padding.
  *
- * Server Component — Sidebar and MobileNav are Client Components imported
- * here, which creates the correct Server→Client boundary.
+ * Mobile (< lg):
+ *   - Sidebar:   hidden (display:none via hidden lg:flex on the <aside>).
+ *                Takes ZERO layout space — it is position:fixed but hidden.
+ *   - MobileNav: position:fixed header + position:fixed slide-out drawer.
+ *                Also takes ZERO layout space — both elements are fixed.
+ *   - Main:      full viewport width (no ml-*), pt-14 clears the 56px (h-14)
+ *                fixed mobile header.
+ *
+ * IMPORTANT — why no outer flex row:
+ *   The Sidebar is already position:fixed, so it never occupies flow space.
+ *   The MobileNav renders only position:fixed elements on mobile.
+ *   Neither component needs a flex sibling relationship with the main div.
+ *   Wrapping all three in a flex row caused MobileNav to consume horizontal
+ *   space as a flex item, leaving only a narrow strip for the main content.
+ *
+ * Server Component — Sidebar and MobileNav are Client Components; importing
+ * them here creates the correct Server→Client boundary.
  */
 
-import Sidebar    from '@/components/layout/Sidebar';
-import MobileNav  from '@/components/layout/MobileNav';
+import Sidebar   from '@/components/layout/Sidebar';
+import MobileNav from '@/components/layout/MobileNav';
 
 export default function AppLayout({ children }) {
   return (
-    <div className="flex min-h-screen bg-zinc-50">
-
-      {/* Desktop: fixed sidebar (hidden on mobile via its own hidden lg:flex) */}
+    <>
+      {/*
+        Desktop sidebar — position:fixed, hidden on mobile.
+        Out of normal document flow; main content uses ml-60 to compensate.
+      */}
       <Sidebar />
 
-      {/* Mobile: sticky header + slide-out drawer (hidden on desktop via lg:hidden) */}
+      {/*
+        Mobile nav — position:fixed header + position:fixed drawer overlay.
+        Hidden on desktop (lg:hidden on the wrapper div hides even fixed
+        children because display:none on a parent removes all descendants).
+        Out of normal document flow; main content uses pt-14 to compensate.
+      */}
       <MobileNav />
 
       {/*
         Main content area.
-        Desktop: offset by sidebar width (lg:ml-60).
-        Mobile: full width, no left margin.
-        pt-0 on desktop (PageHeader already has top padding).
-        On mobile the sticky MobileNav header is 56 px (h-14) and uses
-        position:sticky so the content naturally follows — no extra pt needed.
+        • pt-14 lg:pt-0  — clears the 56px fixed mobile header on mobile;
+                           zero extra top padding on desktop (PageHeader has its own).
+        • lg:ml-60       — offsets the fixed sidebar on desktop only; zero margin on mobile.
+        • min-h-screen   — ensures the background fills the viewport.
+        • overflow-x-hidden — prevents any child from causing horizontal scroll.
       */}
-      <div className="flex-1 lg:ml-60 flex flex-col min-h-screen overflow-x-hidden">
+      <div className="pt-14 lg:pt-0 lg:ml-60 min-h-screen flex flex-col overflow-x-hidden bg-zinc-50">
         {children}
       </div>
-
-    </div>
+    </>
   );
 }

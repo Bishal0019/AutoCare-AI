@@ -8,7 +8,7 @@ function Skel({ className }) {
 
 export default function SessionLoading() {
   return (
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 0px)' }}>
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] lg:h-screen">
       {/* Header */}
       <div className="flex items-start justify-between px-4 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 bg-white border-b border-zinc-200">
         <div className="space-y-2">

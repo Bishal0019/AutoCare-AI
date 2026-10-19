@@ -19,7 +19,7 @@ export default async function VoicePage() {
   const { firstName, vehicle } = await getUIContext(userId);
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col">
+    <div className="h-[calc(100vh-3.5rem)] lg:h-screen overflow-hidden flex flex-col">
       <VoiceUI firstName={firstName} vehicle={vehicle} />
     </div>
   );

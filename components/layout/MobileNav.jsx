@@ -31,14 +31,23 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { Menu, X, MessageSquare } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import { SidebarContent } from './Sidebar';
 
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
   const drawerRef = useRef(null);
   const hamburgerRef = useRef(null);
+
+  /* ── Auto-close drawer on navigation ───────────────────────────── */
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setIsOpen(false);
+  }
 
   /* ── Open / close helpers ──────────────────────────────────────── */
   const open = useCallback(() => setIsOpen(true), []);
@@ -90,7 +99,13 @@ export default function MobileNav() {
     <div className="lg:hidden">
 
       {/* ── Mobile top header bar ──────────────────────────────────── */}
-      <header className="flex items-center gap-3 h-14 px-4 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30">
+      {/*
+        position:fixed inset-x-0 → spans the full viewport width on mobile.
+        The parent lg:hidden wrapper applies display:none at lg+ which correctly
+        removes this element from rendering even though it is position:fixed.
+        z-30 keeps it below the drawer backdrop (z-40) and drawer (z-50).
+      */}
+      <header className="fixed inset-x-0 top-0 z-30 flex items-center gap-3 h-14 px-4 bg-zinc-950 border-b border-zinc-800">
 
         {/* Hamburger */}
         <button
@@ -153,11 +168,12 @@ export default function MobileNav() {
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
+        aria-hidden={!isOpen}
         className={`
           fixed inset-y-0 left-0 z-50 flex flex-col w-72 max-w-[85vw]
           bg-zinc-950 border-r border-zinc-800
           transform transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${isOpen ? 'translate-x-0' : '-translate-x-full pointer-events-none'}
         `}
       >
         {/* Drawer close button — sits in the top-right corner of the drawer */}

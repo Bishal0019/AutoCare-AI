@@ -7,6 +7,10 @@
  *
  * Server Component — no interactivity needed here.
  *
+ * Responsive layout:
+ *   Mobile  (< sm): title stacked above action — no overlap, full button width.
+ *   Desktop (≥ sm): original side-by-side justify-between layout.
+ *
  * Usage:
  *   import PageHeader from '@/components/layout/PageHeader';
  *
@@ -38,7 +42,13 @@ export default function PageHeader({
   return (
     <div
       className={clsx(
-        'flex items-start justify-between gap-4 px-4 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 bg-white',
+        /*
+          Mobile  (< sm): column layout — title on top, action below.
+                          No overlap, no justify-between fighting.
+          Desktop (≥ sm): row layout — title left, action right, justify-between.
+        */
+        'flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4',
+        'px-4 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 bg-white',
         border && 'border-b border-zinc-200',
         className,
       )}
@@ -53,7 +63,13 @@ export default function PageHeader({
       </div>
 
       {action && (
-        <div className="flex items-center gap-2 flex-shrink-0 pt-0.5">{action}</div>
+        /*
+          Mobile:  no flex-shrink-0; button sits in the natural column flow below the title.
+          Desktop: flex-shrink-0 + pt-0.5 — same as before, aligned to the right.
+        */
+        <div className="flex items-center gap-2 sm:flex-shrink-0 sm:pt-0.5">
+          {action}
+        </div>
       )}
     </div>
   );

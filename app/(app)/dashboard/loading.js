@@ -49,12 +49,12 @@ export default function DashboardLoading() {
     <div className="flex flex-col min-h-full">
 
       {/* PageHeader skeleton */}
-      <div className="flex items-start justify-between gap-4 px-4 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 bg-white border-b border-zinc-200">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 px-4 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 bg-white border-b border-zinc-200">
         <div className="space-y-2">
-          <Skeleton className="h-7 w-52" />
-          <Skeleton className="h-4 w-80" />
+          <Skeleton className="h-7 w-48 sm:w-52 max-w-full" />
+          <Skeleton className="h-4 w-64 sm:w-80 max-w-full" />
         </div>
-        <Skeleton className="h-9 w-44 rounded-md flex-shrink-0" />
+        <Skeleton className="h-9 w-44 rounded-md sm:flex-shrink-0" />
       </div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_264px] gap-6 px-4 sm:px-8 py-6 items-start">
