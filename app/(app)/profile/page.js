@@ -56,7 +56,7 @@ export default async function ProfilePage() {
         description="Your personal information and contact preferences."
       />
 
-      <div className="flex-1 grid lg:grid-cols-[1fr_264px] gap-6 px-8 py-6 items-start">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_264px] gap-6 px-4 sm:px-8 py-6 items-start">
 
         {/* ── Left: editable profile ── */}
         <div className="rounded-md border border-zinc-200 bg-white p-6">

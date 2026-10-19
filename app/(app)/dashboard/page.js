@@ -629,13 +629,13 @@ export default async function DashboardPage() {
 
       {/* Appointment / in-progress banner */}
       {activeRequest && (
-        <div className="px-8 pb-2">
+        <div className="px-4 sm:px-8 pb-2">
           <AppointmentBanner request={activeRequest} />
         </div>
       )}
 
       {/* Two-column layout: main + aside */}
-      <div className="flex-1 grid lg:grid-cols-[1fr_264px] gap-6 px-4 sm:px-8 py-6 items-start">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_264px] gap-6 px-4 sm:px-8 py-6 items-start">
 
         {/* ── Main column ── */}
         <div className="space-y-8 min-w-0">

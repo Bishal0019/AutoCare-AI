@@ -38,7 +38,7 @@ export default function PageHeader({
   return (
     <div
       className={clsx(
-        'flex items-start justify-between gap-4 px-8 pt-7 pb-6 bg-white',
+        'flex items-start justify-between gap-4 px-4 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 bg-white',
         border && 'border-b border-zinc-200',
         className,
       )}

@@ -49,7 +49,7 @@ export default function DashboardLoading() {
     <div className="flex flex-col min-h-full">
 
       {/* PageHeader skeleton */}
-      <div className="flex items-start justify-between gap-4 px-8 pt-7 pb-6 bg-white border-b border-zinc-200">
+      <div className="flex items-start justify-between gap-4 px-4 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 bg-white border-b border-zinc-200">
         <div className="space-y-2">
           <Skeleton className="h-7 w-52" />
           <Skeleton className="h-4 w-80" />
@@ -57,7 +57,7 @@ export default function DashboardLoading() {
         <Skeleton className="h-9 w-44 rounded-md flex-shrink-0" />
       </div>
 
-      <div className="flex-1 grid lg:grid-cols-[1fr_264px] gap-6 px-8 py-6 items-start">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_264px] gap-6 px-4 sm:px-8 py-6 items-start">
 
         {/* Main column */}
         <div className="space-y-8">
