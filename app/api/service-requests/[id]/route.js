@@ -162,17 +162,21 @@ export async function PATCH(request, { params }) {
       const timeChanged = prevTime !== newTime;
 
       if (dateChanged || timeChanged) {
-        notifyRescheduled(userId, updated, previous.scheduledDate, prevTime).catch(err =>
-          console.error('[PATCH /api/service-requests/[id]] Reschedule email error:', err.message)
-        );
+        try {
+          await notifyRescheduled(userId, updated, previous.scheduledDate, prevTime);
+        } catch (err) {
+          console.error('[PATCH /api/service-requests/[id]] Reschedule email error:', err.message);
+        }
       } else {
-        console.log('[PATCH] Reschedule no-op — date and time unchanged, skipping email');
+        console.log(`[PATCH /api/service-requests/[id]] Reschedule no-op for ${id} — date and time unchanged, skipping email`);
       }
     } else {
       // Standard status-change notification (cancelled / scheduled)
-      notifyStatusChanged(userId, updated, previous.status).catch(err =>
-        console.error('[PATCH /api/service-requests/[id]] Email error:', err.message)
-      );
+      try {
+        await notifyStatusChanged(userId, updated, previous.status);
+      } catch (err) {
+        console.error('[PATCH /api/service-requests/[id]] Email error:', err.message);
+      }
     }
 
     return NextResponse.json({ request: serialize(updated) });

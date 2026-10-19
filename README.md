@@ -11,7 +11,8 @@
 
 > **AutoCare AI** is an intelligent, full-stack vehicle service assistance and booking-request platform. It combines a text-based AI assistant, a low-latency bidirectional voice assistant powered by Google Gemini Live, authenticated customer dashboards, self-service booking lifecycle management, transactional email updates via Brevo, and automated scheduled maintenance via Vercel Cron.
 
-🌐 **Production Deployment**: [https://autocareai-services.vercel.app/](https://autocareai-services.vercel.app/)
+🌐 **Production Deployment**: [https://autocareai-services.vercel.app/](https://autocareai-services.vercel.app/)  
+📄 **IIT Patna Capstone Documentation**: [Project Report](docs/PROJECT_REPORT.md) · [Testing Report](docs/TESTING_REPORT.md) · [Prompts Used](docs/PROMPTS_USED.md)
 
 ---
 

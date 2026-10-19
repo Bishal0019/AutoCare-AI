@@ -68,10 +68,12 @@ export async function POST(request) {
     await connectDB();
     const created = await ServiceRequest.create(data);
 
-    /* Fire booking email — fire-and-forget, must not affect HTTP response */
-    notifyBookingCreated(userId, created.toObject()).catch(err =>
-      console.error('[POST /api/service-requests] Email error:', err.message)
-    );
+    /* Fire booking email */
+    try {
+      await notifyBookingCreated(userId, created.toObject());
+    } catch (err) {
+      console.error('[POST /api/service-requests] Email error:', err.message);
+    }
 
     return NextResponse.json({ request: serialize(created.toObject()) }, { status: 201 });
   } catch (err) {
