@@ -4,17 +4,17 @@
  * Scheduled cleanup job: permanently deletes expired pending service requests.
  *
  * Expiry rule:
- *   status === 'pending'  AND  scheduledDate < start-of-today (UTC)
+ *   status === 'pending'  AND  scheduledDate < start-of-today (Asia/Kolkata)
  *
- * "Start of today" boundary means a booking scheduled for today is never
- * deleted during the day; only bookings whose date is fully in the past.
+ * A booking for today in the service centre's timezone is never deleted
+ * during that local day; only bookings whose date is fully in the past.
  * Invalid / null scheduledDates are excluded — we never treat a missing
  * date as expired.
  *
  * Protection:
  *   Requires the Authorization header to equal "Bearer <CRON_SECRET>".
- *   On Vercel, set this in Project Settings → Environment Variables, and
- *   add the same secret to vercel.json cron headers (see /vercel.json).
+ *   Set CRON_SECRET in Vercel Project Settings → Environment Variables.
+ *   Vercel sends it as the Authorization bearer token for scheduled calls.
  *   Locally you can trigger it with:
  *     curl -H "Authorization: Bearer <secret>" http://localhost:3000/api/cron/cleanup-expired
  *
@@ -30,6 +30,7 @@
 import { NextResponse } from 'next/server';
 import { connectDB }    from '@/lib/db/mongoose';
 import ServiceRequest   from '@/lib/db/models/ServiceRequest';
+import { startOfBusinessDay } from '@/lib/date/business-day';
 
 export async function GET(request) {
   /* ── Auth: verify cron secret ────────────────────────────────── */
@@ -44,18 +45,9 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  /* ── Expiry boundary: midnight UTC at the start of today ─────── *
-   *
-   * Example: if now is 2026-10-18T14:30:00Z then boundary is
-   *          2026-10-18T00:00:00.000Z
-   *
-   * A booking with scheduledDate = 2026-10-18 (any time) is NOT expired.
-   * A booking with scheduledDate = 2026-10-17 IS expired.
-   */
+  /* Expire by the service centre local calendar date. */
   const now = new Date();
-  const startOfTodayUTC = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-  );
+  const startOfToday = startOfBusinessDay(now);
 
   try {
     await connectDB();
@@ -63,19 +55,19 @@ export async function GET(request) {
     const result = await ServiceRequest.deleteMany({
       status:        'pending',
       scheduledDate: {
-        $lt:  startOfTodayUTC,   // strictly before today
+        $lt:  startOfToday,      // strictly before today in Asia/Kolkata
         $ne:  null,              // exclude null (missing date)
         $exists: true,           // exclude missing field entirely
       },
     });
 
     const deleted = result.deletedCount ?? 0;
-    console.log(`[cron/cleanup-expired] Deleted ${deleted} expired pending request(s) (boundary: ${startOfTodayUTC.toISOString()})`);
+    console.log(`[cron/cleanup-expired] Deleted ${deleted} expired pending request(s) (boundary: ${startOfToday.toISOString()})`);
 
     return NextResponse.json({
       ok:        true,
       deleted,
-      boundary:  startOfTodayUTC.toISOString(),
+      boundary:  startOfToday.toISOString(),
       runAt:     now.toISOString(),
     });
   } catch (err) {

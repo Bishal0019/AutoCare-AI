@@ -18,6 +18,7 @@
 import {
   convertToModelMessages,
   createUIMessageStreamResponse,
+  stepCountIs,
   streamText,
   toUIMessageStream,
 } from 'ai';
@@ -71,14 +72,16 @@ export async function POST(request) {
     knowledgeBase: KNOWLEDGE_BASE_CONTEXT,
   });
 
+  const bookingTurnId = [...messages].reverse().find((message) => message.role === 'user')?.id;
+
   /* ── Stream ── */
   try {
     const result = streamText({
       model:       google(process.env.GEMINI_MODEL ?? 'gemini-1.5-flash'),
       system:      systemPrompt,
       messages:    await convertToModelMessages(messages),
-      tools:       buildTools(userId),
-      maxSteps:    8,
+      tools:       buildTools(userId, bookingTurnId),
+      stopWhen:    stepCountIs(8),
       temperature: 0.1,
     });
 

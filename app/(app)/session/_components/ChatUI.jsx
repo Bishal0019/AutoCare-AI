@@ -63,10 +63,9 @@ function extractServiceRequestRef(message) {
   if (!Array.isArray(message.parts)) return null;
   for (const part of message.parts) {
     if (
-      part.type      === 'tool-invocation'    &&
-      part.state     === 'result'             &&
-      part.toolName  === 'createServiceRequest' &&
-      part.output?.success === true           &&
+      part.type      === 'tool-createServiceRequest' &&
+      part.state     === 'output-available'          &&
+      part.output?.success === true                  &&
       part.output?.referenceId
     ) {
       return part.output.referenceId;
@@ -372,10 +371,14 @@ function MessageRow({ message }) {
   }
 
   if (message.role === 'assistant') {
+    const bookingFailed = message.parts.some((part) =>
+      part.type === 'tool-createServiceRequest' &&
+      ((part.state === 'output-available' && part.output?.success === false) || part.state === 'output-error')
+    );
     return (
       <div className="space-y-1.5">
         {message.parts.map((part, i) => {
-          if (part.type === 'text' && part.text) {
+          if (part.type === 'text' && part.text && !bookingFailed) {
             return (
               <div key={i} className="flex justify-start">
                 <p className="max-w-[80%] sm:max-w-[72%] bg-white border border-zinc-200 text-zinc-800 text-sm px-4 py-2.5 rounded-2xl rounded-bl-sm leading-relaxed whitespace-pre-wrap break-words">
@@ -384,7 +387,7 @@ function MessageRow({ message }) {
               </div>
             );
           }
-          if (part.type === 'tool-invocation') {
+          if (part.type === 'tool-createServiceRequest') {
             return <ToolStatus key={i} part={part} />;
           }
           return null;
@@ -399,22 +402,47 @@ function MessageRow({ message }) {
 /* ── Tool status indicator ──────────────────────────────────────── */
 
 function ToolStatus({ part }) {
-  const { state, toolName, output } = part;
+  const { state, output, errorText } = part;
 
-  if (state === 'call' || state === 'partial-call') {
+  if (state === 'input-available' || state === 'input-streaming') {
     return (
       <div className="flex items-center gap-1.5 text-xs text-zinc-400 pl-1">
         <Loader2 className="w-3.5 h-3.5 animate-spin flex-shrink-0" />
-        <span>{TOOL_LABELS[toolName] ?? 'Processing…'}</span>
+        <span>{TOOL_LABELS.createServiceRequest}</span>
       </div>
     );
   }
 
-  if (state === 'result' && output?.success && toolName === 'createServiceRequest') {
+  if (state === 'output-available' && output?.success === true) {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-green-600 pl-1">
-        <CalendarCheck className="w-3.5 h-3.5 flex-shrink-0" />
-        <span>Service request logged</span>
+      <div className="max-w-[80%] sm:max-w-[72%] rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900">
+        <p className="flex items-center gap-2 font-semibold">
+          <CalendarCheck className="w-4 h-4 flex-shrink-0" />
+          Service request received
+        </p>
+        <p className="mt-1">{output.serviceType}</p>
+        {output.scheduledDate && (
+          <p className="mt-1">Requested for {output.scheduledDate}{output.scheduledTime ? ` at ${output.scheduledTime}` : ''}</p>
+        )}
+        {output.vehicleDetails && <p className="mt-1">Vehicle: {output.vehicleDetails}</p>}
+        {output.referenceId && <p className="mt-1 font-medium">Reference: {output.referenceId}</p>}
+        <p className="mt-1 text-xs text-green-800">{output.nextSteps}</p>
+      </div>
+    );
+  }
+
+  if (state === 'output-available' && output?.success === false) {
+    return (
+      <div className="max-w-[80%] sm:max-w-[72%] rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        {output.errorMessage ?? 'I could not save your service request. Please try again.'}
+      </div>
+    );
+  }
+
+  if (state === 'output-error') {
+    return (
+      <div className="max-w-[80%] sm:max-w-[72%] rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        {errorText || 'I could not save your service request. Please try again.'}
       </div>
     );
   }

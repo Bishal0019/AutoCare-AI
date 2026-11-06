@@ -26,6 +26,7 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db/mongoose';
 import ServiceRequest from '@/lib/db/models/ServiceRequest';
 import { notifyStatusChanged, notifyRescheduled } from '@/lib/email/notify.js';
+import { startOfBusinessDay } from '@/lib/date/business-day';
 
 const VALID_STATUSES = ['pending', 'scheduled', 'in_progress', 'completed', 'cancelled'];
 
@@ -70,19 +71,12 @@ export async function PATCH(request, { params }) {
         );
       }
 
-      // Validate date format and range (must be today or future in UTC)
+      // Validate date format and range using the service centre's local date.
       const newDate = new Date(body.scheduledDate);
       if (isNaN(newDate.getTime())) {
         return NextResponse.json({ error: 'Invalid date format.' }, { status: 400 });
       }
-      const todayUTC = new Date(
-        Date.UTC(
-          new Date().getUTCFullYear(),
-          new Date().getUTCMonth(),
-          new Date().getUTCDate()
-        )
-      );
-      if (newDate < todayUTC) {
+      if (newDate < startOfBusinessDay()) {
         return NextResponse.json(
           { error: 'The appointment date must be today or in the future.' },
           { status: 422 }
